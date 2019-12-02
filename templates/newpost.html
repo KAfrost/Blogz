@@ -3,19 +3,19 @@
 {% block content %}
 <body>
    <form action='/newpost' method='POST'>
-    <label>Blog Title: 
-        <input name='title' type='text'>
-    </label>
+    <label for='title'>Title for your new blog: </label>
+        <br>
+        <input id='title' name='title' type='text'>
     <p>
-    <label>New Blog Post:
+    <label for='blog'>New Blog Post:</label>
+        <br>
         <textarea id=”blog” name=”blog” rows=”30” cols=”50”>
         </textarea>
-    </label>
+    </p>
+    <p>
+        <input type='submit' value='Done'>
     </p>
     </form>
-
-    
-
 
 </body>
 
