@@ -6,18 +6,26 @@
     <label for='title'>Title for your new blog: </label>
         <br>
         <input id='title' name='title' type='text'>
+        <span class="error">{{ title_error }}</span>
     <p>
-    <label for='blog'>New Blog Post:</label>
+    <label for='body'>New Blog Post:</label>
         <br>
-        <textarea id=”blog” name=”blog” rows=”30” cols=”50”>
-        </textarea>
+        <textarea id='body' name='body' rows=”30” cols=”50”></textarea>
+        <span class="error">{{ body_error }}</span>
     </p>
     <p>
         <input type='submit' value='Done'>
     </p>
     </form>
+    
 
 </body>
+
+
+{% if error %}
+<p class='error'>{{ error }}</p>
+{% endif %}
+
 
 
 {% endblock %}

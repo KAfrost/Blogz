@@ -14,7 +14,7 @@ class Blog(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(120))
-    body = db.Column(db.String)
+    body = db.Column(db.String(200))
 
     def __init__(self, title, body):
         self.title = title
@@ -22,30 +22,48 @@ class Blog(db.Model):
 
 
 @app.route('/newpost', methods=['POST', 'GET'])
-def index():
+def new_blog():
 
     if request.method == 'POST':
         blog_title = request.form['title']
-        new_blog = Blog(blog_title)
-        db.session.add(new_blog)
-        db.session.commit()
+        blog_body = request.form['body']
+        new_blog = Blog(blog_title, blog_body)
+
+        title_error = ''
+        body_error = ''
+
+        if blog_title == '':
+            title_error = 'Please enter a title for your blog.'
+
+        if blog_body == '':
+            body_error = 'Please enter text for your blog post'
+
+        if not title_error and not body_error:
+            db.session.add(new_blog)
+            db.session.commit()
+            return redirect('/blog')
+        else:
+            return render_template('newpost.html', title_error = title_error, body_error = body_error)   
 
     return render_template('newpost.html')
 
+@app.route('/blog/', methods=['GET', 'POST'])
+def index():
+    blogs = Blog.query.all() 
+    return render_template('blog.html', blogs=blogs)
 
- # blogs = Blog.query.all()
 
-# @app.route('/delete-task', methods=['POST'])
-# def delete_task():
+@app.route('/blog?', methods = ['GET'])
+def get_blog():
+    blog = request.args.get('blog_id')
+    return render_template ('blog.html', blog_id=blog_id)
 
-#     task_id = int(request.form['task-id'])
-#     task = Task.query.get(task_id)
-#     task.completed = True
-#     db.session.add(task)
-#     db.session.commit()
- 
-#     return redirect('/')
+# return redirect ('/welcome?username=' + username)
 
+# @app.route('/welcome', methods = ['GET'])
+# def welcome():
+#     username = request.args.get('blog')
+#     return render_template ('welcome.html', username=username)
 
 if __name__ == '__main__':
     app.run()
