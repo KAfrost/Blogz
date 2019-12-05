@@ -47,23 +47,16 @@ def new_blog():
 
     return render_template('newpost.html')
 
-@app.route('/blog/', methods=['GET', 'POST'])
-def index():
-    blogs = Blog.query.all() 
-    return render_template('blog.html', blogs=blogs)
 
-
-@app.route('/blog?', methods = ['GET'])
+@app.route('/blog/', methods = ['GET'])
 def get_blog():
-    blog = request.args.get('blog_id')
-    return render_template ('blog.html', blog_id=blog_id)
+    blogs = Blog.query.all()
+    blog_id = request.args.get('blog_id')
+    blog = Blog.query.get(blog_id)
 
-# return redirect ('/welcome?username=' + username)
+    return render_template ('blog.html', blogs=blogs, blog=blog, id=blog_id)
 
-# @app.route('/welcome', methods = ['GET'])
-# def welcome():
-#     username = request.args.get('blog')
-#     return render_template ('welcome.html', username=username)
+
 
 if __name__ == '__main__':
     app.run()
