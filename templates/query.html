@@ -11,3 +11,26 @@
 {% endfor %}
 </body>
 {% endblock %}
+
+<!-- {% block content %}
+  {% if blog %}
+  {% if blog %}
+  <div>
+        <h1>{{ blog.title}}</h1>
+        <h3>{{ blog.body }}</h3>
+  </div>
+  {% else %}
+
+    <h1>My Blog</h1>
+    {% if blogs|length == 0 %}
+    <p>No posts yet</p>
+    {% else %}
+        <div>
+            {% for blog in blogs %}
+            <h1><a href="/blog?blog_id={{blog.id}}">{{ blog.title }}</a></h1>
+            <h3>{{blog.body}}</h3>
+            <hr>
+            {% endfor %}
+        </div>
+    {% endif %}
+  {% endif %} -->
