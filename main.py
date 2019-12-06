@@ -4,6 +4,35 @@ from app import app, db
 from models import Blog, User
 from hashutils import check_pw_hash
 
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    # when a GET request return an empty form to collect login information
+    if request.method == 'GET'
+        return render_template('login.html')
+        
+    # when a PUSH with form information request infomation input through form
+    elif request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password']
+        pw_verify = request.form['pw_verify']
+
+        # check the user db for the first instance of the supplied email (???)
+        user = User.query.filter_by(email=email).first()
+        
+    # if the user is valid and the password provided matches the hashed password in the db, flash the message to the / route
+        if user and check_pw_hash(password, user.pw_hash)
+            session['email'] = email
+            flash('Logged in')
+            return redirect('/')
+    # otherwise flash the error and redirect to the login page
+        else:
+            flash("User password incorrect, or user does not exist", 'error')
+            return redirect('/login')
+
+
+    
+
 # create a new post
 @app.route('/newpost', methods=['POST', 'GET'])
 def new_blog():
