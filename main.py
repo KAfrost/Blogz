@@ -1,46 +1,110 @@
-from flask import request, redirect, render_template
+from flask import request, redirect, render_template, session
 import re
 from app import app, db
 from models import Blog, User
 from hashutils import check_pw_hash
 
+app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RU'
+
+@app.before_request
+def require_login():
+    allowed_routes = ['index', 'get_blog', 'login', 'signup', 'single_user']
+    if request.endpoint not in allowed_routes and 'user' not in session:
+        return redirect('/login')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     # when a GET request return an empty form to collect login information
-    if request.method == 'GET'
+    if request.method == 'GET':
         return render_template('login.html')
         
     # when a PUSH with form information request infomation input through form
     elif request.method == 'POST':
-        email = request.form['email']
+        username = request.form['username']
         password = request.form['password']
-        pw_verify = request.form['pw_verify']
+    
 
-        # check the user db for the first instance of the supplied email (???)
-        user = User.query.filter_by(email=email).first()
+        # check the user db for the first instance of the supplied username
+        user = User.query.filter_by(username=username).first()
         
     # if the user is valid and the password provided matches the hashed password in the db, flash the message to the / route
-        if user and check_pw_hash(password, user.pw_hash)
-            session['email'] = email
-            flash('Logged in')
-            return redirect('/')
-    # otherwise flash the error and redirect to the login page
-        else:
-            flash("User password incorrect, or user does not exist", 'error')
-            return redirect('/login')
-
-
+        if user and check_pw_hash(password, user.pw_hash):
+            session['user'] = username
+            return redirect('/newpost')
+    # otherwise return the error and redirect to the login page
+    if not user:
+        username_error = "Username does not exist."
+        return render_template('login.html', username_error=username_error)
+        
+    if not check_pw_hash(password, user.pw_hash):
+        password_error = "User password incorrect"
+        return render_template('login.html', username=username, password_error=password_error)
     
+
+@app.route('/signup', methods=['GET', 'POST'])
+def signup():
+    # once for is submitted retrieve information from it
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        verify = request.form['verify']
+
+        username_error = ''
+        password_error = ''
+        verify_error = ''
+
+    # check that provided username isn't already in db 
+        username_in_db = User.query.filter_by(username=username).first()
+        if username_in_db:
+            username_error = 'It looks like "' + username + '" is already in use.'
+        
+        if username == '': 
+            username_error = "Please enter a password between 3 and 20 characters."
+        else:
+            if not len(username) > 3 or len(username) > 20:
+                username_error = "Please enter a password between 3 and 20 characters."
+                username = ''
+
+    # verify that passwords match each other
+        if password != verify:
+            password_error = ('Passwords did not match.')
+
+        if password == '':
+            password_error = "Please enter a password between 3 and 20 characters."
+        else:
+            if not len(password) > 3 or len(password) > 20:
+                password_error = "Please enter a password between 3 and 20 characters."
+
+    # if no errors pass user info to db and add "user" info to session
+        if not username_error and not password_error and not verify_error:
+            user = User(username=username, password=password)
+            db.session.add(user)
+            db.session.commit()
+            session['user'] = user.username
+            return redirect('/newpost') 
+    # if GET render an empty template
+        else:
+            return render_template('signup.html', username_error=username_error, password_error=password_error, verify_error=verify_error) 
+    return render_template('signup.html')
+
+@app.route('/logout', methods=['POST'])
+def logout():
+    del session['user']
+    return redirect('/blog')
+
+def logged_in_user():
+    owner = User.query.filter_by(username=session['user']).first()
+    return owner
 
 # create a new post
 @app.route('/newpost', methods=['POST', 'GET'])
 def new_blog():
+    owner = logged_in_user()
 
     if request.method == 'POST':
         blog_title = request.form['title']
         blog_body = request.form['body']
-        new_blog = Blog(blog_title, blog_body)
+        new_blog = Blog(blog_title, blog_body, owner)
  
         title_error = ''
         body_error = ''
@@ -67,24 +131,35 @@ def new_blog():
 
     return render_template('newpost.html')
 
-
-@app.route('/blog/')
+@app.route('/blog')
 def get_blog():
-# use GET to request id from the blog 
     blog_id = request.args.get('blog_id')
 
-# if there is a blog id then provide the information on single blog to template
     if blog_id:
         blog = Blog.query.get(blog_id)
         blogs = None
 
-# if there is no blog id provide all blog information to template
     else:
         blog = None
         blogs = Blog.query.all() 
 
     return render_template ('blog.html', blogs=blogs, blog=blog, id=blog_id)
 
+@app.route('/user')
+def single_user():
+    user_id = request.args.get('user_id')
+
+    if user_id:
+        blogs = Blog.query.filter(Blog.owner_id==user_id).all()
+        
+    return render_template ('blog.html', blogs=blogs, user_id=user_id)
+
+
+@app.route('/')
+def index():
+    users = User.query.all()
+
+    return render_template('index.html', users=users)
 
 if __name__ == '__main__':
     app.run()

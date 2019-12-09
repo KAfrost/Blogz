@@ -10,10 +10,22 @@
         </style>
     </head>
     <body>
-            <h1><a href='/blog'>Main Blog Page</a>
+            <h2><a href='/blog'>Main Blog Page</a>
                 <a href='/newpost'>Add a new Post</a>
-            </h1>
- 
+                <a href='/'>Home</a>
+            </h2>
+
+            <div style='float: right'>
+                {% if 'user' in session %}
+                  {{ session['user'] }}
+                  <form action="/logout" method="post" id='logout'>
+                    <input type="submit" value="Log Out" />
+                  </form>
+                {% else %}
+                  <a href="login">login</a> | <a href="signup">register</a>
+                {% endif %}
+              </div>
+              <h1>
         {% block content %}
         
         {% endblock %}

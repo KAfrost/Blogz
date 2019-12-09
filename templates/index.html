@@ -1,64 +1,10 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>Signup</h1>
-
-<form action="/" method="post">
-    <table>
-        <tbody>
-            <tr>
-                <td>
-                <label for="username">Username: </label>
-                </td>
-                <td>
-                <input name="username" type="text">
-                </td>
-                <td>
-                <span class="error">{{ username_error }}</span>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                <label for="password">Password: </label>
-                </td>
-                <td>
-                <input name="password" type="password">
-                </td>
-                <td>
-                <span class="error">{{ password_error }}</span>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                <label for="verify-password">Verify Password: </label>
-                </td> 
-                <td>
-                <input name="verify-password" type="password">
-                </td>
-                <td>
-                <span class="error">{{ verify_error }}</span>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                <label for="email">Email: (optional) </label>
-                </td>
-                <td>
-                <input name="email" type="text" value="{{ email }}">
-                </td>
-                <td>
-                <span class="error">{{ email_error }}</span>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-    <input type="submit" value="Login">
-</form>
-
-{% if error %}
-<p class='error'>{{ error }}</p>
-{% endif %}
-
-
+<ul>
+{% for user in users %}
+    <li><a href='/user?user_id={{user.id}}'>{{user.username}}</li>
+{% endfor %}
+</ul>
 
 {% endblock %}

@@ -20,13 +20,13 @@ class Blog(db.Model):
 class User(db.Model):
     
     id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(120), unique=True) #email can only be used once
-    pw_hash = db.Column(db.String(120)
+    username = db.Column(db.String(120), unique=True) #username can only be used once
+    pw_hash = db.Column(db.String(120))
     blogs = db.relationship('Blog', backref='owner') #establishes relationship between blog and user
     
-    def __init__(self, email.password):
-        self.email = email
+    def __init__(self, username, password):
+        self.username = username
         self.pw_hash = make_pw_hash(password)
 
     def __repr__(self):
-        return '<User %r>' % self.email
+        return '%r' % self.username
